@@ -141,10 +141,10 @@ export const TOOLS: Record<ToolId, ToolMeta> = {
 // Used to calculate utilization score
 
 export const FREQUENCY_WEIGHT: Record<string, number> = {
-  daily:      1.0,
-  weekly:     0.6,
+  daily: 1.0,
+  weekly: 0.6,
   occasional: 0.3,
-  rare:       0.1,
+  rare: 0.1,
 };
 
 // ─── Utilization thresholds ───────────────────
