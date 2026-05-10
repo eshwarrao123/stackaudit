@@ -48,73 +48,98 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─────────────────────────────────────────
+   Light mode (fallback — app is dark-first)
+   ───────────────────────────────────────── */
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --card: oklch(0.98 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.512 0.223 264.4);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.5 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.93 0 0);
+  --ring: oklch(0.512 0.223 264.4);
+  --chart-1: oklch(0.512 0.223 264.4);
+  --chart-2: oklch(0.696 0.17 162.4);
+  --chart-3: oklch(0.768 0.162 70.1);
+  --chart-4: oklch(0.627 0.209 27.3);
+  --chart-5: oklch(0.623 0.188 259.1);
+  --radius: 0.5rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.512 0.223 264.4);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-border: oklch(0.9 0 0);
+  --sidebar-ring: oklch(0.512 0.223 264.4);
 }
 
+/* ─────────────────────────────────────────────────
+   Dark mode — StackAudit premium dark design system
+   Derived from Stitch-generated StackAudit DS tokens
+   Background:  #13131b  (surface / surface-dim)
+   Card:        #1f1f27  (surface-container)
+   Muted:       #1b1b23  (surface-container-low)
+   Primary:     #6366f1  (Indigo 500)
+   Border:      rgba(255,255,255,0.08)  razor thin
+   ───────────────────────────────────────────────── */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #13131b;
+  --foreground: #e4e1ed;
+
+  --card: #1f1f27;
+  --card-foreground: #e4e1ed;
+
+  --popover: #1f1f27;
+  --popover-foreground: #e4e1ed;
+
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+
+  --secondary: #292932;
+  --secondary-foreground: #e4e1ed;
+
+  --muted: #1b1b23;
+  --muted-foreground: #908fa0;
+
+  --accent: #292932;
+  --accent-foreground: #e4e1ed;
+
+  --destructive: #ef4444;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.06);
+  --ring: #6366f1;
+
+  /* Chart: indigo · emerald · amber · red · blue */
+  --chart-1: #6366f1;
+  --chart-2: #10b981;
+  --chart-3: #f59e0b;
+  --chart-4: #ef4444;
+  --chart-5: #3b82f6;
+
+  --radius: 0.5rem;
+
+  --sidebar: #1b1b23;
+  --sidebar-foreground: #e4e1ed;
+  --sidebar-primary: #6366f1;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #292932;
+  --sidebar-accent-foreground: #e4e1ed;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #6366f1;
 }
 
 @layer base {
@@ -126,5 +151,27 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* ── StackAudit utility classes ─────────────────── */
+@layer utilities {
+  /* Indigo glow — selected cards, CTA hover */
+  .glow-indigo {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15),
+                0 0 40px rgba(99, 102, 241, 0.06);
+  }
+  /* Emerald glow — savings amounts */
+  .glow-emerald {
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.2),
+                0 0 32px rgba(16, 185, 129, 0.06);
+  }
+  /* Linear-style section headers: all-caps, wide tracking */
+  .label-caps {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
   }
 }

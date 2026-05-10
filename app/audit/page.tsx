@@ -189,27 +189,27 @@ export default function AuditPage() {
   // ─────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top bar */}
-      <header className="sticky top-0 z-10 border-b border-border/40 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-xl items-center justify-between px-5 py-4">
+    <div className="min-h-screen bg-[#13131b]">
+      {/* ── Top navbar ── */}
+      <header className="sticky top-0 z-20 border-b border-white/[0.06] bg-[#13131b]/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-3.5">
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 text-sm font-bold tracking-tight text-foreground transition-opacity hover:opacity-80"
+            className="flex items-center gap-2 text-sm font-bold tracking-tight text-white/90 transition-opacity hover:opacity-70"
           >
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-              <Sparkles className="h-4 w-4" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-indigo-500 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]">
+              <Sparkles className="h-3.5 w-3.5" />
             </div>
             StackAudit
           </button>
-          <span className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-white/30">
             Step {step + 1} of {STEPS.length}
           </span>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-xl px-5 py-10 space-y-10">
+      <main className="mx-auto w-full max-w-2xl px-5 py-10 space-y-10">
         {/* Step indicator */}
         <StepIndicator steps={STEPS} currentStep={step} />
 
@@ -238,12 +238,16 @@ export default function AuditPage() {
               variant="ghost"
               onClick={goBack}
               disabled={step === 0}
-              className="gap-1.5"
+              className="gap-1.5 text-white/50 hover:text-white/80 hover:bg-white/[0.05] disabled:opacity-20"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
-            <Button type="button" onClick={goNext} className="gap-1.5">
+            <Button
+              type="button"
+              onClick={goNext}
+              className="gap-1.5 bg-indigo-500 text-white hover:bg-indigo-400 shadow-[0_0_16px_rgba(99,102,241,0.3)] hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"
+            >
               Continue
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -270,10 +274,10 @@ function StepContent({
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl text-foreground">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl text-white/95 leading-tight">
           {title}
         </h1>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
+        <p className="text-sm text-white/45 leading-relaxed">{subtitle}</p>
       </div>
       {children}
     </div>
@@ -294,8 +298,8 @@ function CompanyStep({
   return (
     <div className="space-y-5">
       {/* Team size */}
-      <div className="space-y-1.5">
-        <label htmlFor="teamSize" className="text-sm font-medium">
+      <div className="space-y-2">
+        <label htmlFor="teamSize" className="label-caps">
           Total team size
         </label>
         <Input
@@ -303,16 +307,17 @@ function CompanyStep({
           type="number"
           min={1}
           placeholder="e.g. 12"
+          className="bg-white/[0.04] border-white/[0.08] text-white/85 placeholder:text-white/25 focus:border-indigo-500/50 focus:ring-indigo-500/20"
           {...form.register("teamSize", { valueAsNumber: true })}
         />
         {errors.teamSize && (
-          <p className="text-xs text-destructive">{errors.teamSize.message}</p>
+          <p className="text-xs text-red-400">{errors.teamSize.message}</p>
         )}
       </div>
 
       {/* Company stage */}
-      <div className="space-y-1.5">
-        <label htmlFor="companyStage" className="text-sm font-medium">
+      <div className="space-y-2">
+        <label htmlFor="companyStage" className="label-caps">
           Company stage
         </label>
         <Select
@@ -339,8 +344,8 @@ function CompanyStep({
       </div>
 
       {/* Primary use case */}
-      <div className="space-y-1.5">
-        <label htmlFor="primaryUseCase" className="text-sm font-medium">
+      <div className="space-y-2">
+        <label htmlFor="primaryUseCase" className="label-caps">
           Primary AI use case
         </label>
         <Select
@@ -395,40 +400,34 @@ function AuditSummary({
   return (
     <div className="space-y-8">
       {/* Summary card */}
-      <div className="rounded-2xl border border-border/50 bg-gradient-to-b from-card to-muted/20 p-8 space-y-6 shadow-sm">
-        <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest text-center">
-          Audit Summary
-        </h2>
+      <div className="rounded-2xl border border-white/[0.07] bg-[#1f1f27] p-8 space-y-6">
+        <p className="label-caps text-center">Audit Summary</p>
         <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="space-y-1">
-            <p className="text-3xl font-semibold">{toolCount}</p>
-            <p className="text-xs text-muted-foreground">
-              {toolCount === 1 ? "Tool" : "Tools"}
-            </p>
+          <div className="space-y-1.5">
+            <p className="text-4xl font-semibold tabular-nums text-white/90">{toolCount}</p>
+            <p className="label-caps">{toolCount === 1 ? "Tool" : "Tools"}</p>
           </div>
-          <div className="space-y-1 border-x border-border/40">
-            <p className="text-3xl font-semibold">${totalSpend.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">Monthly spend</p>
+          <div className="space-y-1.5 border-x border-white/[0.06]">
+            <p className="text-4xl font-semibold tabular-nums text-white/90">${totalSpend.toLocaleString()}</p>
+            <p className="label-caps">Monthly spend</p>
           </div>
-          <div className="space-y-1">
-            <p className="text-3xl font-semibold">{teamSize}</p>
-            <p className="text-xs text-muted-foreground">
-              {teamSize === 1 ? "Team member" : "Team members"}
-            </p>
+          <div className="space-y-1.5">
+            <p className="text-4xl font-semibold tabular-nums text-white/90">{teamSize}</p>
+            <p className="label-caps">{teamSize === 1 ? "Member" : "Members"}</p>
           </div>
         </div>
       </div>
 
       {/* What you'll get */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {[
           "Optimization score (0–100)",
           "Estimated monthly savings",
           "Specific tool recommendations",
           "Shareable report link",
         ].map((item) => (
-          <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="text-primary">✓</span>
+          <div key={item} className="flex items-center gap-2.5 text-sm text-white/50">
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500/15 text-indigo-400 text-[10px] font-bold shrink-0">+</span>
             {item}
           </div>
         ))}
@@ -436,7 +435,7 @@ function AuditSummary({
 
       {/* Error message */}
       {error && (
-        <p className="text-sm text-destructive">{error}</p>
+        <p className="text-sm text-red-400 bg-red-500/[0.08] border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
       )}
 
       {/* Submit button */}
@@ -444,7 +443,7 @@ function AuditSummary({
         id="generate-audit-btn"
         type="button"
         size="lg"
-        className="w-full gap-2"
+        className="w-full gap-2 bg-indigo-500 text-white hover:bg-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_28px_rgba(99,102,241,0.4)] transition-all"
         onClick={onSubmit}
         disabled={isSubmitting}
       >
@@ -461,7 +460,7 @@ function AuditSummary({
         )}
       </Button>
 
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs text-white/25">
         Free · No credit card required · Results in seconds
       </p>
     </div>

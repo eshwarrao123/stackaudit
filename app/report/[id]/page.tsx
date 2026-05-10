@@ -1,215 +1,18 @@
 "use client";
 
-// ─────────────────────────────────────────────
-// Report Page — Temporary Client-Side Version
-//
-// Reads the AuditReport from localStorage using the ID
-// in the URL. This will be replaced with a server
-// component (fetching from Supabase) on Day 4.
-// ─────────────────────────────────────────────
-
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, Sparkles, ArrowLeft, AlertTriangle, TrendingDown, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import {
+  Loader2, Sparkles, AlertTriangle, CheckCircle2,
+  AlertCircle, Info, Copy, RotateCcw, TrendingDown,
+} from "lucide-react";
 import { REPORT_STORAGE_PREFIX } from "@/app/actions/audit";
 import type { AuditReport, Recommendation } from "@/lib/engine/types";
 import { TOOLS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-export default function ReportPage() {
-  const params = useParams<{ id: string }>();
-  const router = useRouter();
-  const [report, setReport] = useState<AuditReport | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!params.id) return;
-    try {
-      const raw = localStorage.getItem(`${REPORT_STORAGE_PREFIX}${params.id}`);
-      if (!raw) {
-        setError("Report not found. It may have expired or the link is invalid.");
-        return;
-      }
-      setReport(JSON.parse(raw) as AuditReport);
-    } catch {
-      setError("Failed to load report.");
-    }
-  }, [params.id]);
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
-        <AlertTriangle className="h-8 w-8 text-destructive" />
-        <p className="text-sm text-muted-foreground text-center">{error}</p>
-        <Button variant="outline" onClick={() => router.push("/audit")}>
-          Start a new audit
-        </Button>
-      </div>
-    );
-  }
-
-  if (!report) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  const criticalCount = report.recommendations.filter((r) => r.severity === "critical").length;
-
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-border/40 bg-background/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-xl items-center justify-between px-5 py-4">
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="flex items-center gap-2 text-sm font-bold tracking-tight text-foreground transition-opacity hover:opacity-80"
-          >
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            StackAudit
-          </button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-            }}
-            className="text-xs"
-          >
-            Copy link
-          </Button>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-xl px-5 py-10 space-y-8">
-        {/* Score hero */}
-        <div className="rounded-2xl border border-border/50 bg-gradient-to-b from-card to-muted/20 p-8 text-center space-y-4 shadow-sm">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
-            Optimization Score
-          </p>
-          <div className="flex items-end justify-center gap-2">
-            <span
-              className={cn(
-                "text-7xl font-bold tabular-nums tracking-tighter",
-                report.score >= 70
-                  ? "text-foreground"
-                  : report.score >= 40
-                  ? "text-amber-500"
-                  : "text-destructive"
-              )}
-            >
-              {report.score}
-            </span>
-            <span className="text-2xl text-muted-foreground mb-2">/100</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {report.score >= 70
-              ? "Your AI stack is reasonably optimized."
-              : report.score >= 40
-              ? "There's meaningful room to reduce spend."
-              : "Significant savings are available right now."}
-          </p>
-        </div>
-
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3">
-          <StatCard
-            label="Monthly spend"
-            value={`$${report.totalMonthlySpend.toLocaleString()}`}
-          />
-          <StatCard
-            label="Est. savings"
-            value={`$${Math.round(report.estimatedMonthlySavings).toLocaleString()}`}
-            highlight
-          />
-          <StatCard
-            label="Issues found"
-            value={String(criticalCount)}
-            sub="critical"
-          />
-        </div>
-
-        {/* Recommendations */}
-        {report.recommendations.length > 0 ? (
-          <div className="space-y-3">
-            <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
-              Recommendations ({report.recommendations.length})
-            </h2>
-            {report.recommendations.map((rec) => (
-              <RecommendationCard key={rec.id} rec={rec} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-border/50 bg-card p-6 text-center space-y-2">
-            <CheckCircle2 className="h-6 w-6 text-green-500 mx-auto" />
-            <p className="text-sm font-medium">Your stack looks clean!</p>
-            <p className="text-xs text-muted-foreground">
-              No major overlaps or waste detected with the tools you selected.
-            </p>
-          </div>
-        )}
-
-        {/* Tool breakdown */}
-        <div className="space-y-3">
-          <h2 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
-            Tool breakdown
-          </h2>
-          <div className="divide-y divide-border/50 rounded-xl border border-border/50 bg-card overflow-hidden">
-            {report.toolBreakdown.map((tool) => (
-              <div
-                key={tool.toolId}
-                className="flex items-center justify-between px-4 py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">{TOOL_ICONS[tool.toolId]}</span>
-                  <div>
-                    <p className="text-sm font-medium leading-none">
-                      {TOOLS[tool.toolId].name}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
-                      {tool.seats} seat{tool.seats !== 1 ? "s" : ""} · $
-                      {tool.costPerSeat.toFixed(0)}/seat
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold">
-                    ${tool.monthlySpend.toLocaleString()}
-                    <span className="text-[11px] text-muted-foreground font-normal">/mo</span>
-                  </p>
-                  <UtilBadge score={tool.utilizationScore} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="rounded-xl border border-border/50 bg-card p-5 text-center space-y-3">
-          <p className="text-sm font-medium">Want a detailed implementation plan?</p>
-          <p className="text-xs text-muted-foreground">
-            Enter your email to receive a full breakdown with step-by-step instructions.
-          </p>
-          <Button
-            className="w-full"
-            onClick={() => router.push("/audit")}
-          >
-            Run another audit
-          </Button>
-        </div>
-      </main>
-    </div>
-  );
-}
-
-// ─── Sub-components ───────────────────────────
-
+// ─── Tool icon map ────────────────────────────
 const TOOL_ICONS: Record<string, string> = {
   "chatgpt": "🤖", "claude": "🧠", "cursor": "⚡", "copilot": "🐙",
   "gemini": "✨", "openai-api": "🔌", "anthropic-api": "🔌",
@@ -217,97 +20,340 @@ const TOOL_ICONS: Record<string, string> = {
   "grammarly": "✍️", "jasper": "🚀", "runway": "🎬",
 };
 
-const SEVERITY_ICON: Record<string, React.ReactNode> = {
-  critical: <AlertCircle className="h-4 w-4 text-destructive shrink-0" />,
-  warning:  <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />,
-  info:     <Info className="h-4 w-4 text-blue-500 shrink-0" />,
+// ─── Severity config ──────────────────────────
+const SEV_CONFIG = {
+  critical: {
+    icon: <AlertCircle className="h-4 w-4 shrink-0" />,
+    iconCls: "text-red-400",
+    borderCls: "border-red-500/20",
+    bgCls: "bg-red-500/[0.04]",
+    accentCls: "bg-red-500",
+  },
+  warning: {
+    icon: <AlertTriangle className="h-4 w-4 shrink-0" />,
+    iconCls: "text-amber-400",
+    borderCls: "border-amber-500/20",
+    bgCls: "bg-amber-500/[0.04]",
+    accentCls: "bg-amber-500",
+  },
+  info: {
+    icon: <Info className="h-4 w-4 shrink-0" />,
+    iconCls: "text-blue-400",
+    borderCls: "border-blue-500/20",
+    bgCls: "bg-blue-500/[0.04]",
+    accentCls: "bg-blue-500",
+  },
+} as const;
+
+const TYPE_LABEL: Record<string, { label: string; cls: string }> = {
+  eliminate:   { label: "Eliminate",   cls: "bg-red-500/15 text-red-400 ring-red-500/20" },
+  consolidate: { label: "Consolidate", cls: "bg-orange-500/15 text-orange-400 ring-orange-500/20" },
+  downgrade:   { label: "Downgrade",   cls: "bg-yellow-500/15 text-yellow-400 ring-yellow-500/20" },
+  optimize:    { label: "Optimize",    cls: "bg-blue-500/15 text-blue-400 ring-blue-500/20" },
+  keep:        { label: "Keep",        cls: "bg-emerald-500/15 text-emerald-400 ring-emerald-500/20" },
 };
 
-const SEVERITY_BORDER: Record<string, string> = {
-  critical: "border-destructive/20 bg-destructive/[0.03]",
-  warning:  "border-amber-500/20 bg-amber-500/[0.03]",
-  info:     "border-blue-500/20 bg-blue-500/[0.03]",
-};
+// ─── Page ─────────────────────────────────────
+export default function ReportPage() {
+  const params = useParams<{ id: string }>();
+  const router = useRouter();
+  const [report, setReport] = useState<AuditReport | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-const TYPE_BADGE: Record<string, string> = {
-  eliminate:   "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  consolidate: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-  downgrade:   "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-  optimize:    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  keep:        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-};
+  useEffect(() => {
+    if (!params.id) return;
+    try {
+      const raw = localStorage.getItem(`${REPORT_STORAGE_PREFIX}${params.id}`);
+      if (!raw) { setError("Report not found or expired."); return; }
+      setReport(JSON.parse(raw) as AuditReport);
+    } catch { setError("Failed to load report."); }
+  }, [params.id]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (error) return <ErrorState message={error} />;
+  if (!report) return <LoadingState />;
+
+  const criticals = report.recommendations.filter((r) => r.severity === "critical").length;
+  const scoreColor =
+    report.score >= 70 ? "text-emerald-400" :
+    report.score >= 40 ? "text-amber-400" : "text-red-400";
+  const scoreGlow =
+    report.score >= 70 ? "shadow-[0_0_40px_rgba(16,185,129,0.12)]" :
+    report.score >= 40 ? "shadow-[0_0_40px_rgba(245,158,11,0.12)]" :
+    "shadow-[0_0_40px_rgba(239,68,68,0.12)]";
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* ── Nav ── */}
+      <header className="sticky top-0 z-20 border-b border-white/[0.06] bg-[#13131b]/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-3.5">
+          <button
+            type="button"
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 text-sm font-bold tracking-tight text-white/90 transition-opacity hover:opacity-70"
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-indigo-500 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]">
+              <Sparkles className="h-3.5 w-3.5" />
+            </div>
+            StackAudit
+          </button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="h-8 gap-1.5 text-xs text-white/50 hover:text-white/80"
+            >
+              <Copy className="h-3.5 w-3.5" />
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push("/audit")}
+              className="h-8 gap-1.5 text-xs border-white/10 bg-white/[0.04] text-white/70 hover:bg-white/[0.08] hover:text-white/90"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              New audit
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-2xl px-5 py-12 space-y-10">
+
+        {/* ── Score Hero ── */}
+        <div className={cn(
+          "relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#1f1f27] px-8 py-10 text-center",
+          scoreGlow
+        )}>
+          {/* Subtle radial glow bg */}
+          <div className={cn(
+            "pointer-events-none absolute inset-0 opacity-20",
+            report.score >= 70
+              ? "bg-[radial-gradient(ellipse_at_50%_0%,rgba(16,185,129,0.3),transparent_70%)]"
+              : report.score >= 40
+              ? "bg-[radial-gradient(ellipse_at_50%_0%,rgba(245,158,11,0.3),transparent_70%)]"
+              : "bg-[radial-gradient(ellipse_at_50%_0%,rgba(239,68,68,0.3),transparent_70%)]"
+          )} />
+
+          <p className="label-caps mb-6">Optimization Score</p>
+          <div className="flex items-baseline justify-center gap-2">
+            <span className={cn("text-[80px] font-semibold leading-none tracking-tight tabular-nums", scoreColor)}>
+              {report.score}
+            </span>
+            <span className="text-2xl font-normal text-white/20 mb-1">/100</span>
+          </div>
+          <p className="mt-4 text-sm text-white/50">
+            {report.score >= 70
+              ? "Your AI stack is reasonably well optimized."
+              : report.score >= 40
+              ? "There's meaningful room to reduce your AI spend."
+              : "Significant savings are available right now."}
+          </p>
+        </div>
+
+        {/* ── Stats row ── */}
+        <div className="grid grid-cols-3 gap-3">
+          <StatCard
+            label="Monthly Spend"
+            value={`$${report.totalMonthlySpend.toLocaleString()}`}
+          />
+          <StatCard
+            label="Est. Savings"
+            value={`$${Math.round(report.estimatedMonthlySavings).toLocaleString()}`}
+            sub="per month"
+            emerald
+          />
+          <StatCard
+            label="Critical Issues"
+            value={String(criticals)}
+            danger={criticals > 0}
+          />
+        </div>
+
+        {/* ── Recommendations ── */}
+        <section className="space-y-3">
+          <SectionLabel icon={<TrendingDown className="h-3.5 w-3.5" />}>
+            Recommendations{report.recommendations.length > 0 && ` (${report.recommendations.length})`}
+          </SectionLabel>
+
+          {report.recommendations.length === 0 ? (
+            <EmptyRecommendations />
+          ) : (
+            report.recommendations.map((rec) => (
+              <RecommendationCard key={rec.id} rec={rec} />
+            ))
+          )}
+        </section>
+
+        {/* ── Tool breakdown ── */}
+        <section className="space-y-3">
+          <SectionLabel>Tool Breakdown</SectionLabel>
+          <div className="overflow-hidden rounded-xl border border-white/[0.07] bg-[#1f1f27] divide-y divide-white/[0.05]">
+            {report.toolBreakdown.map((tool) => {
+              const meta = TOOLS[tool.toolId];
+              const icon = TOOL_ICONS[tool.toolId] ?? "🔧";
+              return (
+                <div
+                  key={tool.toolId}
+                  className="flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-white/[0.03]"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-base">
+                      {icon}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white/90 leading-none">{meta?.name ?? tool.toolId}</p>
+                      <p className="mt-1 text-[11px] text-white/40">
+                        {tool.seats} seat{tool.seats !== 1 ? "s" : ""} · ${tool.costPerSeat.toFixed(0)}/seat
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-white/90 tabular-nums">
+                      ${tool.monthlySpend.toLocaleString()}
+                      <span className="text-[11px] font-normal text-white/30">/mo</span>
+                    </p>
+                    <UtilBadge score={tool.utilizationScore} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── CTA ── */}
+        <div className="rounded-xl border border-white/[0.07] bg-[#1f1f27] p-6 text-center space-y-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 border border-indigo-500/20 mx-auto">
+            <Sparkles className="h-5 w-5 text-indigo-400" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-white/90">Want a savings implementation plan?</p>
+            <p className="text-xs text-white/40">
+              Enter your email below to receive step-by-step instructions for each recommendation.
+            </p>
+          </div>
+          <div className="flex gap-2 max-w-sm mx-auto">
+            <input
+              type="email"
+              placeholder="you@startup.com"
+              className="flex-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white/80 placeholder:text-white/25 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+            />
+            <Button className="bg-indigo-500 text-white hover:bg-indigo-400 shadow-[0_0_16px_rgba(99,102,241,0.3)]">
+              Send report
+            </Button>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  );
+}
+
+// ─── Sub-components ───────────────────────────
+
+function SectionLabel({
+  children,
+  icon,
+}: {
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-1.5">
+      {icon && <span className="text-white/30">{icon}</span>}
+      <span className="label-caps">{children}</span>
+    </div>
+  );
+}
 
 function StatCard({
   label,
   value,
   sub,
-  highlight,
+  emerald,
+  danger,
 }: {
   label: string;
   value: string;
   sub?: string;
-  highlight?: boolean;
+  emerald?: boolean;
+  danger?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "rounded-xl border p-4 text-center space-y-1",
-        highlight
-          ? "border-green-500/20 bg-green-500/[0.04]"
-          : "border-border/50 bg-card"
+        "rounded-xl border px-4 py-5 text-center space-y-1.5",
+        emerald
+          ? "border-emerald-500/20 bg-emerald-500/[0.04] shadow-[0_0_20px_rgba(16,185,129,0.06)]"
+          : danger
+          ? "border-red-500/20 bg-[#1f1f27]"
+          : "border-white/[0.07] bg-[#1f1f27]"
       )}
     >
       <p
         className={cn(
-          "text-xl font-semibold tabular-nums",
-          highlight && "text-green-600 dark:text-green-400"
+          "text-2xl font-semibold tabular-nums tracking-tight",
+          emerald ? "text-emerald-400" : danger ? "text-red-400" : "text-white/90"
         )}
       >
         {value}
       </p>
-      <p className="text-[11px] text-muted-foreground leading-tight">
-        {label}
-        {sub && <span className="block font-medium text-destructive">{sub}</span>}
-      </p>
+      <div>
+        <p className="label-caps">{label}</p>
+        {sub && <p className="text-[10px] text-white/30 mt-0.5">{sub}</p>}
+      </div>
     </div>
   );
 }
 
 function RecommendationCard({ rec }: { rec: Recommendation }) {
+  const sev = SEV_CONFIG[rec.severity as keyof typeof SEV_CONFIG] ?? SEV_CONFIG.info;
+  const type = TYPE_LABEL[rec.type] ?? { label: rec.type, cls: "bg-white/10 text-white/50 ring-white/10" };
+
   return (
     <div
       className={cn(
-        "rounded-xl border p-4 space-y-3",
-        SEVERITY_BORDER[rec.severity]
+        "relative overflow-hidden rounded-xl border p-5 space-y-4",
+        sev.borderCls, sev.bgCls
       )}
     >
-      <div className="flex items-start gap-2.5">
-        {SEVERITY_ICON[rec.severity]}
-        <div className="flex-1 space-y-1">
+      {/* Left accent bar */}
+      <div className={cn("absolute left-0 top-4 bottom-4 w-0.5 rounded-full", sev.accentCls)} />
+
+      <div className="pl-3 flex items-start gap-3">
+        <span className={cn("mt-0.5", sev.iconCls)}>{sev.icon}</span>
+        <div className="flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-semibold leading-none">{rec.title}</p>
+            <p className="text-sm font-semibold text-white/90 leading-none">{rec.title}</p>
             <span
               className={cn(
-                "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
-                TYPE_BADGE[rec.type]
+                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1",
+                type.cls
               )}
             >
-              {rec.type}
+              {type.label}
             </span>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {rec.description}
-          </p>
+          <p className="text-xs text-white/50 leading-relaxed">{rec.description}</p>
         </div>
       </div>
-      <div className="flex items-center justify-between border-t border-border/30 pt-3">
-        <p className="text-xs text-muted-foreground">
+
+      <div className="pl-3 flex items-center justify-between border-t border-white/[0.06] pt-3">
+        <p className="text-xs text-white/40">
           Est. saving:{" "}
-          <span className="font-semibold text-foreground">
+          <span className="font-semibold text-emerald-400">
             ${Math.round(rec.estimatedMonthlySaving).toLocaleString()}/mo
           </span>
         </p>
-        <span className="text-xs font-medium text-foreground/70 bg-muted/50 rounded-lg px-2.5 py-1">
+        <span className="text-[11px] font-medium text-white/50 bg-white/[0.06] rounded-md px-2.5 py-1">
           {rec.actionLabel}
         </span>
       </div>
@@ -316,15 +362,54 @@ function RecommendationCard({ rec }: { rec: Recommendation }) {
 }
 
 function UtilBadge({ score }: { score: number }) {
-  const color =
-    score >= 60
-      ? "text-green-600 dark:text-green-400"
-      : score >= 30
-      ? "text-amber-600 dark:text-amber-400"
-      : "text-destructive";
+  const cls =
+    score >= 60 ? "text-emerald-400" :
+    score >= 30 ? "text-amber-400" : "text-red-400";
   return (
-    <p className={cn("text-[11px] font-semibold mt-0.5", color)}>
+    <p className={cn("text-[11px] font-medium mt-1 tabular-nums", cls)}>
       {score}% utilized
     </p>
+  );
+}
+
+function EmptyRecommendations() {
+  return (
+    <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-8 text-center space-y-2">
+      <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto" />
+      <p className="text-sm font-semibold text-white/90">Your stack looks clean!</p>
+      <p className="text-xs text-white/40">
+        No major overlaps or waste detected with the tools you selected.
+      </p>
+    </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="h-5 w-5 animate-spin text-white/20" />
+    </div>
+  );
+}
+
+function ErrorState({ message }: { message: string }) {
+  const router = useRouter();
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/[0.08]">
+        <AlertTriangle className="h-6 w-6 text-red-400" />
+      </div>
+      <div className="space-y-1">
+        <p className="text-sm font-medium text-white/80">{message}</p>
+        <p className="text-xs text-white/30">Your report may have been cleared from localStorage.</p>
+      </div>
+      <Button
+        variant="outline"
+        onClick={() => router.push("/audit")}
+        className="border-white/10 text-white/70 hover:bg-white/[0.06]"
+      >
+        Start a new audit
+      </Button>
+    </div>
   );
 }
