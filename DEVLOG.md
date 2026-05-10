@@ -61,3 +61,40 @@
 - Improve mobile responsiveness
 - Add lead capture flow
 - Start implementing shareable public reports
+
+## Day 3 — 2026-05-10
+
+**Hours worked:** 5
+
+**What I did:**
+- Connected onboarding flow directly with the deterministic audit engine
+- Added client-side audit generation and local report persistence
+- Implemented dynamic report routes using `/report/[id]`
+- Built the final audit report experience with optimization scoring
+- Added recommendation cards with severity indicators and estimated savings
+- Added tool utilization breakdown cards
+- Redesigned the entire UI using a premium dark SaaS visual system
+- Integrated Stitch MCP generated design direction into the frontend
+- Improved onboarding hierarchy, spacing, and navigation flow
+- Added glowing CTA buttons, dark surfaces, and refined typography styling
+- Added report copy-link flow and reusable stat cards
+
+**What I learned:**
+- Design systems create much stronger visual consistency than isolated component styling
+- Small visual details like spacing, muted borders, and typography hierarchy dramatically improve perceived product quality
+- Recommendation presentation matters as much as recommendation accuracy
+- Stitch MCP helped accelerate premium UI exploration much faster than manual iteration alone
+
+**Issues encountered:**
+- Report routing initially failed because the `/api/audit` endpoint was never implemented
+- Needed several refinement passes to avoid overusing gradients and glow effects
+- Balancing dark theme contrast while maintaining readability required multiple adjustments
+- The default Next.js landing page still needs replacement with a proper marketing homepage
+
+**Plan for tomorrow:**
+- Build the landing page at `/`
+- Add marketing sections and product positioning
+- Improve mobile responsiveness across report screens
+- Add lead capture backend integration
+- Start Supabase persistence integration
+- Prepare for deployment and Lighthouse optimization
