@@ -98,3 +98,38 @@
 - Add lead capture backend integration
 - Start Supabase persistence integration
 - Prepare for deployment and Lighthouse optimization
+
+## Day 4 — 2026-05-11
+
+**Hours worked:** 7
+
+**What I did:**
+- Built a deterministic AI spend optimization engine
+- Added reusable audit rule architecture
+- Implemented overlap detection logic for AI tools
+- Added seat overprovisioning and low-usage analysis
+- Built dynamic optimization scoring system
+- Connected audit engine to report generation flow
+- Replaced hardcoded report data with live calculated results
+- Added structured recommendation cards with severity and savings estimates
+- Added realistic demo datasets for multiple startup profiles
+- Improved TypeScript architecture and modularized business logic
+
+**What I learned:**
+- Deterministic systems are easier to maintain and debug than fully AI-generated outputs
+- Separating business logic from UI greatly improves scalability
+- Scoring systems need balanced penalties to avoid unrealistic outputs
+- Dynamic reporting creates a much stronger product experience than static mock data
+
+**Issues encountered:**
+- Needed careful deduplication logic to avoid repeated recommendations
+- Balancing optimization scores required multiple scoring adjustments
+- Dynamic report rendering required stricter typing across components
+- LocalStorage persistence needed synchronization with generated report IDs
+
+**Plan for tomorrow:**
+- Add public shareable report pages
+- Add lead capture and email collection flow
+- Improve mobile responsiveness across all pages
+- Add onboarding refinements and report export preparation
+- Begin deployment preparation and production cleanup

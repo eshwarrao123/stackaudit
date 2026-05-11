@@ -7,7 +7,7 @@ import {
   AlertCircle, Info, Copy, RotateCcw, TrendingDown,
 } from "lucide-react";
 import { REPORT_STORAGE_PREFIX } from "@/app/actions/audit";
-import type { AuditReport, Recommendation } from "@/lib/engine/types";
+import type { FullAuditReport, AuditRecommendation } from "@/lib/audit-engine/types";
 import { TOOLS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,7 @@ const TYPE_LABEL: Record<string, { label: string; cls: string }> = {
 export default function ReportPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const [report, setReport] = useState<AuditReport | null>(null);
+  const [report, setReport] = useState<FullAuditReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -66,7 +66,7 @@ export default function ReportPage() {
     try {
       const raw = localStorage.getItem(`${REPORT_STORAGE_PREFIX}${params.id}`);
       if (!raw) { setError("Report not found or expired."); return; }
-      setReport(JSON.parse(raw) as AuditReport);
+      setReport(JSON.parse(raw) as FullAuditReport);
     } catch { setError("Failed to load report."); }
   }, [params.id]);
 
@@ -163,11 +163,11 @@ export default function ReportPage() {
         <div className="grid grid-cols-3 gap-3">
           <StatCard
             label="Monthly Spend"
-            value={`$${report.totalMonthlySpend.toLocaleString()}`}
+            value={`$${report.totalSpend.toLocaleString()}`}
           />
           <StatCard
             label="Est. Savings"
-            value={`$${Math.round(report.estimatedMonthlySavings).toLocaleString()}`}
+            value={`$${Math.round(report.monthlyWaste).toLocaleString()}`}
             sub="per month"
             emerald
           />
@@ -197,9 +197,10 @@ export default function ReportPage() {
         <section className="space-y-3">
           <SectionLabel>Tool Breakdown</SectionLabel>
           <div className="overflow-hidden rounded-xl border border-white/[0.07] bg-[#1f1f27] divide-y divide-white/[0.05]">
-            {report.toolBreakdown.map((tool) => {
+            {report.input.tools.map((tool) => {
               const meta = TOOLS[tool.toolId];
               const icon = TOOL_ICONS[tool.toolId] ?? "🔧";
+              const costPerSeat = tool.seats > 0 ? tool.monthlySpend / tool.seats : 0;
               return (
                 <div
                   key={tool.toolId}
@@ -212,7 +213,7 @@ export default function ReportPage() {
                     <div>
                       <p className="text-sm font-medium text-white/90 leading-none">{meta?.name ?? tool.toolId}</p>
                       <p className="mt-1 text-[11px] text-white/40">
-                        {tool.seats} seat{tool.seats !== 1 ? "s" : ""} · ${tool.costPerSeat.toFixed(0)}/seat
+                        {tool.seats} seat{tool.seats !== 1 ? "s" : ""} · ${costPerSeat.toFixed(0)}/seat
                       </p>
                     </div>
                   </div>
@@ -221,7 +222,9 @@ export default function ReportPage() {
                       ${tool.monthlySpend.toLocaleString()}
                       <span className="text-[11px] font-normal text-white/30">/mo</span>
                     </p>
-                    <UtilBadge score={tool.utilizationScore} />
+                    <p className="text-[11px] font-medium mt-1 text-white/50 capitalize">
+                      {tool.usageFrequency} usage
+                    </p>
                   </div>
                 </div>
               );
@@ -314,9 +317,8 @@ function StatCard({
   );
 }
 
-function RecommendationCard({ rec }: { rec: Recommendation }) {
+function RecommendationCard({ rec }: { rec: AuditRecommendation }) {
   const sev = SEV_CONFIG[rec.severity as keyof typeof SEV_CONFIG] ?? SEV_CONFIG.info;
-  const type = TYPE_LABEL[rec.type] ?? { label: rec.type, cls: "bg-white/10 text-white/50 ring-white/10" };
 
   return (
     <div
@@ -333,13 +335,8 @@ function RecommendationCard({ rec }: { rec: Recommendation }) {
         <div className="flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-semibold text-white/90 leading-none">{rec.title}</p>
-            <span
-              className={cn(
-                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1",
-                type.cls
-              )}
-            >
-              {type.label}
+            <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/50 ring-1 ring-white/10">
+              {rec.category}
             </span>
           </div>
           <p className="text-xs text-white/50 leading-relaxed">{rec.description}</p>
@@ -350,25 +347,14 @@ function RecommendationCard({ rec }: { rec: Recommendation }) {
         <p className="text-xs text-white/40">
           Est. saving:{" "}
           <span className="font-semibold text-emerald-400">
-            ${Math.round(rec.estimatedMonthlySaving).toLocaleString()}/mo
+            ${Math.round(rec.estimatedSavings).toLocaleString()}/mo
           </span>
         </p>
         <span className="text-[11px] font-medium text-white/50 bg-white/[0.06] rounded-md px-2.5 py-1">
-          {rec.actionLabel}
+          {rec.action}
         </span>
       </div>
     </div>
-  );
-}
-
-function UtilBadge({ score }: { score: number }) {
-  const cls =
-    score >= 60 ? "text-emerald-400" :
-    score >= 30 ? "text-amber-400" : "text-red-400";
-  return (
-    <p className={cn("text-[11px] font-medium mt-1 tabular-nums", cls)}>
-      {score}% utilized
-    </p>
   );
 }
 

@@ -1,33 +1,34 @@
 // ─────────────────────────────────────────────
 // Audit Action — Client-Side
 //
-// Calls generateAuditReport() directly in the browser.
+// Calls the deterministic audit engine directly in the browser.
 // Stores the full report in localStorage so the report
 // page can read it without a backend.
-//
-// When Supabase is wired up (Day 4), replace the
-// localStorage.setItem call with a fetch to /api/audit.
 // ─────────────────────────────────────────────
 
-import { generateAuditReport } from "@/lib/engine/analyzer";
+import { runAuditEngine } from "@/lib/audit-engine/engine";
 import type { AuditInputSchema } from "@/lib/schemas/audit";
-import type { AuditInput } from "@/lib/engine/types";
+import type { FullAuditReport } from "@/lib/audit-engine/types";
 
 export const REPORT_STORAGE_PREFIX = "stackaudit:report:";
 
 /**
- * Maps the Zod form schema (AuditInputSchema) to the
- * engine's AuditInput type, runs the audit, stores the
+ * Runs the deterministic audit engine, stores the
  * result in localStorage, and returns the report ID.
  */
 export async function runAuditClient(
   data: AuditInputSchema
 ): Promise<{ reportId: string }> {
-  // AuditInputSchema and AuditInput are structurally identical —
-  // the cast is safe because the Zod schema validates the same shape.
-  const input = data as AuditInput;
-
-  const report = generateAuditReport(input);
+  
+  const result = runAuditEngine(data);
+  const reportId = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+  
+  const report: FullAuditReport = {
+    id: reportId,
+    timestamp: new Date().toISOString(),
+    input: data,
+    ...result
+  };
 
   // Persist to localStorage so /report/[id] can read it
   try {
@@ -50,15 +51,15 @@ export async function runAuditClient(
   if (process.env.NODE_ENV === "development") {
     console.group(`[StackAudit] Audit complete — ${report.id}`);
     console.log("Score:", report.score);
-    console.log("Total spend:", `$${report.totalMonthlySpend}/mo`);
-    console.log("Estimated savings:", `$${report.estimatedMonthlySavings.toFixed(0)}/mo`);
+    console.log("Total spend:", `$${report.totalSpend}/mo`);
+    console.log("Estimated savings:", `$${report.totalRecoverableSavings}/mo`);
     console.log("Recommendations:", report.recommendations.length);
     console.table(
       report.recommendations.map((r) => ({
         severity: r.severity,
         title: r.title,
-        saving: `$${r.estimatedMonthlySaving.toFixed(0)}/mo`,
-        action: r.actionLabel,
+        saving: `$${r.estimatedSavings}/mo`,
+        action: r.action,
       }))
     );
     console.groupEnd();
