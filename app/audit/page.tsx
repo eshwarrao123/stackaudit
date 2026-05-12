@@ -192,7 +192,7 @@ export default function AuditPage() {
     <div className="min-h-screen bg-[#13131b]">
       {/* ── Top navbar ── */}
       <header className="sticky top-0 z-20 border-b border-white/[0.06] bg-[#13131b]/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-3.5">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 sm:px-5 py-3.5">
           <button
             type="button"
             onClick={() => router.push("/")}
@@ -209,7 +209,7 @@ export default function AuditPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-2xl px-5 py-10 space-y-10">
+      <main className="mx-auto w-full max-w-2xl px-4 sm:px-5 py-8 sm:py-10 space-y-8 sm:space-y-10">
         {/* Step indicator */}
         <StepIndicator steps={STEPS} currentStep={step} />
 
@@ -400,19 +400,19 @@ function AuditSummary({
   return (
     <div className="space-y-8">
       {/* Summary card */}
-      <div className="rounded-2xl border border-white/[0.07] bg-[#1f1f27] p-8 space-y-6">
+      <div className="rounded-2xl border border-white/[0.07] bg-[#1f1f27] p-6 sm:p-8 space-y-6">
         <p className="label-caps text-center">Audit Summary</p>
-        <div className="grid grid-cols-3 gap-4 text-center">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
           <div className="space-y-1.5">
-            <p className="text-4xl font-semibold tabular-nums text-white/90">{toolCount}</p>
+            <p className="text-3xl sm:text-4xl font-semibold tabular-nums text-white/90">{toolCount}</p>
             <p className="label-caps">{toolCount === 1 ? "Tool" : "Tools"}</p>
           </div>
           <div className="space-y-1.5 border-x border-white/[0.06]">
-            <p className="text-4xl font-semibold tabular-nums text-white/90">${totalSpend.toLocaleString()}</p>
+            <p className="text-3xl sm:text-4xl font-semibold tabular-nums text-white/90">${totalSpend.toLocaleString()}</p>
             <p className="label-caps">Monthly spend</p>
           </div>
           <div className="space-y-1.5">
-            <p className="text-4xl font-semibold tabular-nums text-white/90">{teamSize}</p>
+            <p className="text-3xl sm:text-4xl font-semibold tabular-nums text-white/90">{teamSize}</p>
             <p className="label-caps">{teamSize === 1 ? "Member" : "Members"}</p>
           </div>
         </div>

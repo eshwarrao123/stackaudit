@@ -133,3 +133,41 @@
 - Improve mobile responsiveness across all pages
 - Add onboarding refinements and report export preparation
 - Begin deployment preparation and production cleanup
+
+## Day 5 — 2026-05-12
+
+**Hours worked:** 5
+
+**What I did:**
+- Added Supabase persistence layer for generated audit reports
+- Implemented database-backed public shareable reports
+- Added report fetching with localStorage fallback support
+- Created reports and leads database schema
+- Added production-ready lead capture flow after recommendations
+- Added report metadata including timestamps and company context
+- Added overlap insight cards with conflict percentages
+- Added confidence scoring to recommendation cards
+- Improved mobile responsiveness across onboarding and report pages
+- Added copy-share-link functionality
+- Improved loading states, error handling, and fallback logic
+
+**What I learned:**
+- Public persistence dramatically changes how “real” a SaaS product feels
+- Fallback architecture improves reliability during local development
+- Recommendation confidence scores improved perceived intelligence significantly
+- Mobile spacing and layout refinement takes longer than expected in SaaS UIs
+
+**Issues encountered:**
+- Needed dual localStorage + database fallback logic to avoid broken reports during setup
+- Report hydration required careful async handling
+- Mobile report layouts needed multiple spacing adjustments
+- Supabase environment configuration required additional validation handling
+
+**Plan for tomorrow:**
+- Final production cleanup
+- Lighthouse optimization
+- Accessibility improvements
+- OG image generation
+- Final deployment
+- Submission document preparation
+- Demo polishing
