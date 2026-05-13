@@ -16,9 +16,9 @@ import {
   Sparkles,
   TrendingDown,
   Users,
+  Zap,
 } from "lucide-react";
 import { fetchReport } from "@/lib/supabase/db";
-import { submitLead } from "@/lib/supabase/db";
 import type { FullAuditReport, AuditRecommendation } from "@/lib/audit-engine/types";
 import { TOOLS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -97,14 +97,40 @@ export default function ReportPage() {
   const [report, setReport] = useState<FullAuditReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [displayScore, setDisplayScore] = useState(0);
 
   useEffect(() => {
     if (!params.id) return;
-
     fetchReport(params.id)
       .then((r) => {
         if (!r) setError("Report not found or has expired.");
-        else setReport(r);
+        else {
+          setReport(r);
+          // Animate score counter
+          const target = r.score;
+          let current = 0;
+          const step = Math.ceil(target / 30);
+          const timer = setInterval(() => {
+            current = Math.min(current + step, target);
+            setDisplayScore(current);
+            if (current >= target) clearInterval(timer);
+          }, 30);
+          // Fetch AI summary server-side
+          setSummaryLoading(true);
+          fetch("/api/summary", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(r),
+          })
+            .then((res) => res.json())
+            .then((data: { summary?: string }) => {
+              if (data.summary) setAiSummary(data.summary);
+            })
+            .catch(() => null)
+            .finally(() => setSummaryLoading(false));
+        }
       })
       .catch(() => setError("Failed to load report. Please try again."));
   }, [params.id]);
@@ -218,11 +244,11 @@ export default function ReportPage() {
           <div className="flex items-baseline justify-center gap-2">
             <span
               className={cn(
-                "text-[64px] sm:text-[80px] font-semibold leading-none tracking-tight tabular-nums",
+                "text-[64px] sm:text-[80px] font-semibold leading-none tracking-tight tabular-nums transition-all",
                 scoreColor
               )}
             >
-              {report.score}
+              {displayScore}
             </span>
             <span className="text-xl sm:text-2xl font-normal text-white/20 mb-1">
               /100
@@ -255,6 +281,28 @@ export default function ReportPage() {
             danger={criticals > 0}
           />
         </div>
+
+        {/* ── AI Summary ── */}
+        {(summaryLoading || aiSummary) && (
+          <section>
+            <div className="rounded-xl border border-indigo-500/15 bg-indigo-500/[0.03] px-5 py-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <Zap className="h-3.5 w-3.5 text-indigo-400" />
+                <span className="label-caps">AI Audit Summary</span>
+                {summaryLoading && <Loader2 className="h-3 w-3 animate-spin text-white/30 ml-auto" />}
+              </div>
+              {summaryLoading && !aiSummary ? (
+                <div className="space-y-2 pt-1">
+                  <div className="h-3 w-full rounded bg-white/[0.06] animate-pulse" />
+                  <div className="h-3 w-5/6 rounded bg-white/[0.06] animate-pulse" />
+                  <div className="h-3 w-4/6 rounded bg-white/[0.06] animate-pulse" />
+                </div>
+              ) : (
+                <p className="text-sm text-white/60 leading-relaxed">{aiSummary}</p>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* ── Recommendations ── */}
         <section className="space-y-3">
@@ -310,7 +358,7 @@ export default function ReportPage() {
         )}
 
         {/* ── Lead Capture ── */}
-        <LeadCaptureCard reportId={report.id} />
+        <LeadCaptureCard reportId={report.id} report={report} />
 
         {/* ── Tool Breakdown ── */}
         <section className="space-y-3">
@@ -380,8 +428,9 @@ export default function ReportPage() {
 
 // ─── Lead Capture Card ────────────────────────
 
-function LeadCaptureCard({ reportId }: { reportId: string }) {
+function LeadCaptureCard({ reportId, report }: { reportId: string; report: FullAuditReport }) {
   const [email, setEmail] = useState("");
+  const [honeypot, setHoneypot] = useState(""); // bot trap — should stay empty
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -396,10 +445,26 @@ function LeadCaptureCard({ reportId }: { reportId: string }) {
     setStatus("loading");
     setErrorMsg("");
 
-    const result = await submitLead(trimmed, reportId, "report_cta");
-    if (result.success) {
-      setStatus("success");
-    } else {
+    try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: trimmed,
+          reportId,
+          reportUrl: `${appUrl}/report/${reportId}`,
+          estimatedSavings: report.monthlyWaste,
+          totalSpend: report.totalSpend,
+          score: report.score,
+          source: "report_cta",
+          website: honeypot, // honeypot — bots fill this; humans don't
+        }),
+      });
+      const data = (await res.json()) as { success: boolean };
+      if (data.success) setStatus("success");
+      else { setStatus("error"); setErrorMsg("Something went wrong. Please try again."); }
+    } catch {
       setStatus("error");
       setErrorMsg("Something went wrong. Please try again.");
     }
@@ -419,48 +484,45 @@ function LeadCaptureCard({ reportId }: { reportId: string }) {
 
   return (
     <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/[0.03] p-5 sm:p-6 space-y-4">
-      {/* Header */}
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/20">
           <Sparkles className="h-4 w-4 text-indigo-400" />
         </div>
         <div className="space-y-0.5">
-          <p className="text-sm font-semibold text-white/90">
-            Get your implementation plan
-          </p>
-          <p className="text-xs text-white/40">
-            We&apos;ll email you a step-by-step guide for each recommendation.
-          </p>
+          <p className="text-sm font-semibold text-white/90">Get your implementation plan</p>
+          <p className="text-xs text-white/40">We&apos;ll email you a step-by-step guide for each recommendation.</p>
         </div>
       </div>
 
-      {/* Benefits */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {[
           { icon: <Mail className="h-3 w-3" />, text: "Export-ready PDF report" },
           { icon: <Bell className="h-3 w-3" />, text: "Spend change alerts" },
           { icon: <TrendingDown className="h-3 w-3" />, text: "Monthly savings digest" },
         ].map(({ icon, text }) => (
-          <div
-            key={text}
-            className="flex items-center gap-2 rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2"
-          >
+          <div key={text} className="flex items-center gap-2 rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2">
             <span className="text-indigo-400">{icon}</span>
             <span className="text-[11px] text-white/50">{text}</span>
           </div>
         ))}
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+        {/* Honeypot: hidden from real users via CSS, bots fill it automatically */}
+        <input
+          type="text"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          tabIndex={-1}
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px", opacity: 0, pointerEvents: "none" }}
+          autoComplete="off"
+        />
         <input
           ref={inputRef}
           type="email"
           value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setErrorMsg("");
-          }}
+          onChange={(e) => { setEmail(e.target.value); setErrorMsg(""); }}
           placeholder="you@company.com"
           className="flex-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white/80 placeholder:text-white/25 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-colors"
           disabled={status === "loading"}
@@ -471,23 +533,17 @@ function LeadCaptureCard({ reportId }: { reportId: string }) {
           className="bg-indigo-500 text-white hover:bg-indigo-400 shadow-[0_0_16px_rgba(99,102,241,0.3)] shrink-0 gap-2"
         >
           {status === "loading" ? (
-            <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Sending…
-            </>
-          ) : (
-            "Send plan"
-          )}
+            <><Loader2 className="h-3.5 w-3.5 animate-spin" />Sending…</>
+          ) : "Send plan"}
         </Button>
       </form>
-      {errorMsg && (
-        <p className="text-[11px] text-red-400">{errorMsg}</p>
-      )}
+      {errorMsg && <p className="text-[11px] text-red-400">{errorMsg}</p>}
     </div>
   );
 }
 
 // ─── Sub-components ───────────────────────────
+
 
 function SectionLabel({
   children,
