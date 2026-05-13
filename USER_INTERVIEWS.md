@@ -1,34 +1,83 @@
-# User Interview Summaries
 
-### Interview 1: J.K., Engineering Lead
-**Role**: Engineering Lead @ 25-person AI Startup (Series A)
-**Context**: Managing a technical team using Cursor, Copilot, and individual ChatGPT accounts.
+## Interview 1 — Karthik R. (Friend’s Brother)
+**Role:** Programmer Analyst @ Cognizant  
+**Team Size:** ~18 developers in internal banking project  
+**Call Duration:** ~15 mins on Google Meet
 
-> "I literally don't know who has a company seat and who is just expensing a $20/mo personal sub. I suspect we're paying for Cursor and Copilot for at least 5 people who only use one of them."
-> "The waste isn't just the $20, it's the mental overhead of managing the seats."
-> "I want a button that just cancels everything and starts a clean team account."
+Karthik said their team started using multiple AI tools separately without any planning. Some developers preferred GitHub Copilot while others switched to Cursor after seeing YouTube videos and Twitter posts.
 
-**Surprising Insight**: The user didn't care about the total $ amount as much as the "messiness." They wanted a "cleanup" tool, not just a "savings" tool.
-**Design Change**: Added the "Consolidation Steps" section to the report, giving clear instructions on *how* to merge accounts, not just telling them they have an overlap.
+> “Honestly nobody even knows which tools are officially approved anymore.”
 
-### Interview 2: S.R., Solo Founder
-**Role**: Founder @ Stealth AI Tool
-**Context**: Pre-seed, extremely price-sensitive.
+> “A few people use company Copilot but still pay for ChatGPT Plus personally because they think Copilot is bad for debugging.”
 
-> "I check my bank account daily, so I know I have Midjourney and Runway, but I forgot Notion AI was an extra $10/mo per seat."
-> "If you could tell me exactly when to downgrade, that's more useful than just telling me to cancel."
-> "I'd pay for this if it found $50 in savings. That's a week of server costs."
+> “Managers only look at total software cost during quarterly reviews. By then nobody remembers who requested what.”
 
-**Surprising Insight**: Even tiny $10/mo charges are painful for solo founders because they feel "tricked" by the default-on toggles.
-**Design Change**: Increased the visibility of "Low Usage" flags for small $10 add-ons like Notion AI.
+One thing he mentioned that surprised me was that many developers keep inactive subscriptions running simply because reimbursement is handled slowly inside the company.
 
-### Interview 3: M.L., Fractional COO
-**Role**: Operations Consultant for multiple startups.
-**Context**: Manages spend for 4 different teams simultaneously.
+He also mentioned that overlap alone is not enough — managers want confidence before removing tools because teams get attached to workflows.
 
-> "I need a shareable link I can put in a Slack thread. I can't be exporting PDFs and emailing them to busy founders."
-> "The scoring is great. It's a quick way to show I'm doing my job."
-> "It's annoying that I have to type in the tool names. Can I just upload a CSV?"
+### What changed in the product
+After this conversation, I added:
+- overlap percentage visibility
+- clearer “safe consolidation” wording
+- confidence indicators beside recommendations
 
-**Surprising Insight**: The user viewed StackAudit as a "status tool" to prove their value to their clients.
-**Design Change**: Prioritized the "Share Report" and "Copy Link" functionality to make it frictionless to post in Slack/Discord.
+Instead of saying “cancel immediately,” the report became more cautious and operational.
+
+
+---
+
+## Interview 2 — Sai Teja (College Senior)
+**Role:** Data Analyst @ TCS  
+**Team Size:** ~12 people  
+**Conversation:** Discord call (~10–12 mins)
+
+Sai Teja mainly works with dashboards, Excel automation, SQL, and internal reporting. He said their team recently started experimenting with ChatGPT Team licenses while some employees still used Gemini and Claude separately.
+
+> “Most people don’t use these tools daily. They use them heavily for one week and forget about them.”
+
+> “For data teams, usage changes based on deadlines. During reporting weeks everybody suddenly becomes an AI power user.”
+
+> “The difficult part is proving whether the subscription actually improved productivity.”
+
+The interesting part was that he didn’t care much about saving small amounts monthly. He cared more about knowing which tools were actually being used consistently.
+
+He also said the report should feel understandable to non-technical managers, not only developers.
+
+### What changed in the product
+This changed how I displayed:
+- low-usage recommendations
+- utilization labels
+- report readability
+
+I simplified several recommendation cards because the earlier wording felt too technical.
+
+
+---
+
+## Interview 3 — Akhil S. (Friend Running Small Agency)
+**Role:** Freelance Designer + Small Agency Owner  
+**Team Size:** 4 people  
+**Conversation:** In person
+
+Akhil’s team uses Midjourney, ChatGPT Plus, Canva Pro, and Runway occasionally for client work. Since the team is small, he tracks expenses personally.
+
+> “Subscriptions are annoying because every tool slowly adds AI features and charges separately.”
+
+> “Sometimes we buy tools just because creators hype them on YouTube.”
+
+> “I don’t need enterprise analytics. I just want to know what I should stop paying for.”
+
+He also mentioned that reports with too many charts feel fake and overwhelming. He preferred quick summaries with very obvious actions.
+
+One surprising thing he said was:
+> “I’d probably share this with friends just to compare who wastes more money.”
+
+That made me think about the shareability aspect differently.
+
+### What changed in the product
+After this interview I:
+- reduced visual clutter in the report page
+- kept the optimization score highly visible
+- improved the share-link flow
+- focused the landing page messaging more on “wasted spend” instead of “AI governance”
