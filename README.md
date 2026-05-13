@@ -72,3 +72,6 @@ The application is optimized for Vercel.
 - Implement caching layers for AI-generated summaries to reduce OpenAI API costs.
 - Expand the deterministic engine ruleset to cover infrastructure and cloud provider overlap.
 - Add user authentication for historical report tracking.
+
+## Demo Screen Recording Video 
+- https://www.loom.com/share/7b1bca719881457b85ce6565b625884b
