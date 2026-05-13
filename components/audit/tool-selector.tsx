@@ -5,7 +5,6 @@ import { TOOLS } from "@/lib/constants";
 import type { ToolId } from "@/lib/engine/types";
 import { Check } from "lucide-react";
 
-// ─── Category display config ──────────────────
 const CATEGORY_CONFIG: Record<string, { label: string; order: number }> = {
   assistant: { label: "AI Assistants", order: 0 },
   code:      { label: "Code Tools",   order: 1 },
@@ -45,7 +44,6 @@ export function ToolSelector({ selected, onChange, error }: ToolSelectorProps) {
     );
   };
 
-  // Group and sort by category order
   const grouped = Object.values(TOOLS).reduce<Record<string, typeof TOOLS[ToolId][]>>(
     (acc, tool) => {
       if (!acc[tool.category]) acc[tool.category] = [];
@@ -67,7 +65,6 @@ export function ToolSelector({ selected, onChange, error }: ToolSelectorProps) {
 
         return (
           <div key={category} className="space-y-2.5">
-            {/* Category label — Linear-style */}
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-white/35">
               {CATEGORY_CONFIG[category].label}
             </p>
@@ -90,7 +87,6 @@ export function ToolSelector({ selected, onChange, error }: ToolSelectorProps) {
                         : "border-white/[0.07] bg-[#1f1f27] hover:border-white/[0.14] hover:bg-white/[0.04]"
                     )}
                   >
-                    {/* Indigo check badge — top right */}
                     <span
                       className={cn(
                         "absolute right-3 top-3 flex h-4 w-4 items-center justify-center rounded-full transition-all duration-200",

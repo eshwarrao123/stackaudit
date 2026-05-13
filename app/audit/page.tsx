@@ -15,9 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ToolId } from "@/lib/engine/types";
 
-// ─────────────────────────────────────────────
-// Step definitions
-// ─────────────────────────────────────────────
 
 const STEPS = [
   { label: "Tools",   description: "Pick your AI stack" },
@@ -26,9 +23,6 @@ const STEPS = [
   { label: "Audit",   description: "Generate report" },
 ];
 
-// ─────────────────────────────────────────────
-// Slide animation variants
-// ─────────────────────────────────────────────
 
 const slideVariants = {
   enter: (dir: number) => ({
@@ -42,30 +36,24 @@ const slideVariants = {
   }),
 };
 
-// ─────────────────────────────────────────────
-// Audit Page
-// ─────────────────────────────────────────────
 
 export default function AuditPage() {
   const router = useRouter();
   const { form, submit } = useAuditForm();
   const [step, setStep] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+  const [direction, setDirection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Derive selected tool IDs from form state for cross-step sharing
   const selectedToolIds = (form.watch("tools") ?? []).map(
     (t) => t.toolId as ToolId
   );
 
-  // ── Step navigation ───────────────────────
 
   const goNext = async () => {
     let valid = false;
 
     if (step === 0) {
-      // Validate: at least one tool selected
       valid = selectedToolIds.length > 0;
       if (!valid) {
         form.setError("tools", { message: "Select at least one AI tool to continue" });
@@ -89,21 +77,18 @@ export default function AuditPage() {
     setStep((s) => Math.max(s - 1, 0));
   };
 
-  // ── Submit ────────────────────────────────
 
   const handleSubmit = async () => {
     setSubmitError(null);
     setIsSubmitting(true);
     try {
       await submit();
-      // Navigation handled inside useAuditForm after success
     } catch {
       setSubmitError("Something went wrong. Please try again.");
       setIsSubmitting(false);
     }
   };
 
-  // ── Step content ──────────────────────────
 
   const renderStep = () => {
     switch (step) {
@@ -116,8 +101,6 @@ export default function AuditPage() {
             <ToolSelector
               selected={selectedToolIds}
               onChange={(ids) => {
-                // Maintain field array in sync — SpendInput handles append/remove
-                // Here we just set the top-level selection for the selector UI
                 form.setValue(
                   "tools",
                   ids.map((id) => {
@@ -184,9 +167,6 @@ export default function AuditPage() {
     }
   };
 
-  // ─────────────────────────────────────────
-  // Render
-  // ─────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-[#13131b]">
@@ -258,9 +238,6 @@ export default function AuditPage() {
   );
 }
 
-// ─────────────────────────────────────────────
-// StepContent wrapper
-// ─────────────────────────────────────────────
 
 function StepContent({
   title,
@@ -284,9 +261,6 @@ function StepContent({
   );
 }
 
-// ─────────────────────────────────────────────
-// Step 3 — Company details sub-form
-// ─────────────────────────────────────────────
 
 function CompanyStep({
   form,
@@ -375,12 +349,8 @@ function CompanyStep({
   );
 }
 
-// ─────────────────────────────────────────────
-// Step 4 — Audit summary + submit
-// ─────────────────────────────────────────────
 
-// Import type for the form
-type AuditInputSchema = import("@/lib/schemas/audit").AuditInputSchema;
+import type { AuditInputSchema } from "@/lib/schemas/audit";
 
 function AuditSummary({
   toolCount,

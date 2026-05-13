@@ -8,15 +8,7 @@ import type { AuditInputSchema } from "@/lib/schemas/audit";
 import type { ToolId, UseCase, UsageFrequency } from "@/lib/engine/types";
 import { cn } from "@/lib/utils";
 
-// ─────────────────────────────────────────────
-// SpendInput — Step 2
-//
-// For each selected tool, renders:
-//   - Monthly spend (USD)
-//   - Seat count
-//   - Usage frequency (button group)
-//   - Use cases (checkboxes)
-// ─────────────────────────────────────────────
+
 
 const FREQUENCY_OPTIONS: { value: UsageFrequency; label: string; description: string }[] = [
   { value: "daily",      label: "Daily",      description: "Used every day" },
@@ -78,7 +70,6 @@ export function SpendInput({ selectedToolIds }: SpendInputProps) {
       }
     }
 
-    // Remove de-selected tools
     fields.forEach((field, index) => {
       if (!selectedToolIds.includes(field.toolId as ToolId)) {
         remove(index);
@@ -109,7 +100,6 @@ export function SpendInput({ selectedToolIds }: SpendInputProps) {
             key={field.id}
             className="group relative rounded-2xl border border-border/60 bg-card/50 p-5 space-y-6 shadow-sm transition-all hover:border-border hover:shadow-md"
           >
-            {/* Tool header */}
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/50 bg-muted/40 shadow-sm">
                 <span className="text-xl leading-none" role="img" aria-hidden>
@@ -122,7 +112,6 @@ export function SpendInput({ selectedToolIds }: SpendInputProps) {
               </div>
             </div>
 
-            {/* Spend + Seats */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label
@@ -171,7 +160,6 @@ export function SpendInput({ selectedToolIds }: SpendInputProps) {
               </div>
             </div>
 
-            {/* Usage frequency */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground">Usage frequency</p>
               <div className="flex flex-wrap gap-2">
@@ -198,7 +186,6 @@ export function SpendInput({ selectedToolIds }: SpendInputProps) {
               </div>
             </div>
 
-            {/* Use cases */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-foreground">Used for</p>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">

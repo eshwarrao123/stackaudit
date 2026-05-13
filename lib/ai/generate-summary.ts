@@ -123,7 +123,16 @@ export async function generateAuditSummary(
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      if (response.status === 429) {
+        console.warn("[StackAudit] OpenAI API rate limit exceeded (429). Using deterministic fallback summary.");
+      } else {
+        console.warn(`[StackAudit] OpenAI API error (${response.status}). Using deterministic fallback summary.`);
+      }
+      return {
+        summary: buildDeterministicSummary(report),
+        source: "fallback",
+        prompt,
+      };
     }
 
     const json = (await response.json()) as {
@@ -131,11 +140,18 @@ export async function generateAuditSummary(
     };
 
     const summary = json.choices[0]?.message?.content?.trim();
-    if (!summary) throw new Error("Empty response from OpenAI");
+    if (!summary) {
+      console.warn("[StackAudit] Empty response from OpenAI. Using deterministic fallback summary.");
+      return {
+        summary: buildDeterministicSummary(report),
+        source: "fallback",
+        prompt,
+      };
+    }
 
     return { summary, source: "ai", prompt };
   } catch (err) {
-    console.warn("[StackAudit] AI summary generation failed, using fallback:", err);
+    console.warn("[StackAudit] AI summary generation failed, using fallback:", err instanceof Error ? err.message : String(err));
     return {
       summary: buildDeterministicSummary(report),
       source: "fallback",

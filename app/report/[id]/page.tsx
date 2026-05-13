@@ -24,7 +24,6 @@ import { TOOLS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-// ─── Tool icon map ────────────────────────────
 const TOOL_ICONS: Record<string, string> = {
   chatgpt: "🤖",
   claude: "🧠",
@@ -41,7 +40,6 @@ const TOOL_ICONS: Record<string, string> = {
   runway: "🎬",
 };
 
-// ─── Severity config ──────────────────────────
 const SEV_CONFIG = {
   critical: {
     icon: <AlertCircle className="h-4 w-4 shrink-0" />,
@@ -77,8 +75,6 @@ const SEV_CONFIG = {
   },
 } as const;
 
-// ─── Helpers ──────────────────────────────────
-
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
     month: "short",
@@ -88,8 +84,6 @@ function formatDate(iso: string): string {
     minute: "2-digit",
   });
 }
-
-// ─── Page ─────────────────────────────────────
 
 export default function ReportPage() {
   const params = useParams<{ id: string }>();
@@ -108,7 +102,6 @@ export default function ReportPage() {
         if (!r) setError("Report not found or has expired.");
         else {
           setReport(r);
-          // Animate score counter
           const target = r.score;
           let current = 0;
           const step = Math.ceil(target / 30);
@@ -117,7 +110,6 @@ export default function ReportPage() {
             setDisplayScore(current);
             if (current >= target) clearInterval(timer);
           }, 30);
-          // Fetch AI summary server-side
           setSummaryLoading(true);
           fetch("/api/summary", {
             method: "POST",
@@ -171,7 +163,6 @@ export default function ReportPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ── Nav ── */}
       <header className="sticky top-0 z-20 border-b border-white/[0.06] bg-[#13131b]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 sm:px-5 py-3.5">
           <button
@@ -208,9 +199,7 @@ export default function ReportPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-2xl px-4 sm:px-5 py-8 sm:py-12 space-y-6 sm:space-y-10">
-
-        {/* ── Report Metadata ── */}
+      <main className="mx-auto w-full max-w-2xl px-4 sm:px-5 py-8 sm:py-12 space-y-12">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-white/30">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -225,9 +214,9 @@ export default function ReportPage() {
             <span>·</span>
             <span className="capitalize">{report.input.primaryUseCase}</span>
           </span>
+          <p className="text-white/40">StackAudit Complete</p>
         </div>
 
-        {/* ── Score Hero ── */}
         <div
           className={cn(
             "relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#1f1f27] px-6 sm:px-8 py-8 sm:py-10 text-center",
@@ -263,7 +252,6 @@ export default function ReportPage() {
           </p>
         </div>
 
-        {/* ── Stats row ── */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <StatCard
             label="Monthly Spend"
@@ -281,8 +269,6 @@ export default function ReportPage() {
             danger={criticals > 0}
           />
         </div>
-
-        {/* ── AI Summary ── */}
         {(summaryLoading || aiSummary) && (
           <section>
             <div className="rounded-xl border border-indigo-500/15 bg-indigo-500/[0.03] px-5 py-4 space-y-2">
@@ -303,8 +289,6 @@ export default function ReportPage() {
             </div>
           </section>
         )}
-
-        {/* ── Recommendations ── */}
         <section className="space-y-3">
           <SectionLabel icon={<TrendingDown className="h-3.5 w-3.5" />}>
             Recommendations
@@ -323,7 +307,6 @@ export default function ReportPage() {
           )}
         </section>
 
-        {/* ── Overlap Insights ── */}
         {report.overlaps.length > 0 && (
           <section className="space-y-3">
             <SectionLabel icon={<ArrowUpRight className="h-3.5 w-3.5" />}>
@@ -356,11 +339,8 @@ export default function ReportPage() {
             </div>
           </section>
         )}
+        <LeadCaptureCard report={report} />
 
-        {/* ── Lead Capture ── */}
-        <LeadCaptureCard reportId={report.id} report={report} />
-
-        {/* ── Tool Breakdown ── */}
         <section className="space-y-3">
           <SectionLabel>Tool Breakdown</SectionLabel>
           <div className="overflow-hidden rounded-xl border border-white/[0.07] bg-[#1f1f27] divide-y divide-white/[0.05]">
@@ -404,8 +384,6 @@ export default function ReportPage() {
             })}
           </div>
         </section>
-
-        {/* ── Footer CTA ── */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-white/[0.07] bg-[#1f1f27] px-5 py-4">
           <p className="text-xs text-white/40 text-center sm:text-left">
             Share this report with your team or finance lead.
@@ -426,9 +404,8 @@ export default function ReportPage() {
   );
 }
 
-// ─── Lead Capture Card ────────────────────────
 
-function LeadCaptureCard({ reportId, report }: { reportId: string; report: FullAuditReport }) {
+function LeadCaptureCard({ report }: { report: FullAuditReport }) {
   const [email, setEmail] = useState("");
   const [honeypot, setHoneypot] = useState(""); // bot trap — should stay empty
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -452,8 +429,8 @@ function LeadCaptureCard({ reportId, report }: { reportId: string; report: FullA
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: trimmed,
-          reportId,
-          reportUrl: `${appUrl}/report/${reportId}`,
+          reportId: report.id,
+          reportUrl: `${appUrl}/report/${report.id}`,
           estimatedSavings: report.monthlyWaste,
           totalSpend: report.totalSpend,
           score: report.score,
@@ -542,7 +519,6 @@ function LeadCaptureCard({ reportId, report }: { reportId: string; report: FullA
   );
 }
 
-// ─── Sub-components ───────────────────────────
 
 
 function SectionLabel({
@@ -616,7 +592,6 @@ function RecommendationCard({ rec }: { rec: AuditRecommendation }) {
         sev.bgCls
       )}
     >
-      {/* Left accent bar */}
       <div
         className={cn(
           "absolute left-0 top-4 bottom-4 w-0.5 rounded-full",

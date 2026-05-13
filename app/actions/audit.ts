@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────
-// Audit Action — Client-Side
-//
-// Runs the deterministic audit engine and persists
-// the result via the DB layer (Supabase + localStorage).
-// ─────────────────────────────────────────────
+
 "use client";
 
 import { runAuditEngine } from "@/lib/audit-engine/engine";
@@ -28,22 +23,6 @@ export async function runAuditClient(
 
   await persistReport(report);
 
-  if (process.env.NODE_ENV === "development") {
-    console.group(`[StackAudit] Audit complete — ${report.id}`);
-    console.log("Score:", report.score);
-    console.log("Total spend:", `$${report.totalSpend}/mo`);
-    console.log("Est. savings:", `$${report.totalRecoverableSavings}/mo`);
-    console.log("Recommendations:", report.recommendations.length);
-    console.table(
-      report.recommendations.map((r) => ({
-        severity: r.severity,
-        title: r.title,
-        saving: `$${r.estimatedSavings}/mo`,
-        action: r.action,
-      }))
-    );
-    console.groupEnd();
-  }
 
   return { reportId: report.id };
 }

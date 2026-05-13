@@ -1,11 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// API Route: POST /api/summary
-//
-// Accepts a FullAuditReport, generates an AI summary server-side
-// (so OPENAI_API_KEY is never exposed to the client), and returns it.
-//
-// Called by the report page after the report loads.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { NextRequest, NextResponse } from "next/server";
 import { generateAuditSummary } from "@/lib/ai/generate-summary";
@@ -24,8 +16,7 @@ export async function POST(req: NextRequest) {
 
     const result = await generateAuditSummary(report);
     return NextResponse.json(result);
-  } catch (err) {
-    console.error("[StackAudit] /api/summary error:", err);
+  } catch {
     return NextResponse.json(
       { error: "Failed to generate summary" },
       { status: 500 }

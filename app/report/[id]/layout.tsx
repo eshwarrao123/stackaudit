@@ -1,17 +1,7 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// Dynamic Metadata for /report/[id]
-//
-// Next.js App Router generateMetadata — runs server-side.
-// Fetches the report from Supabase to build accurate OG/Twitter metadata.
-// ─────────────────────────────────────────────────────────────────────────────
-
-import type { Metadata } from "next";
 import { fetchReport } from "@/lib/supabase/db";
+import type { Metadata } from "next";
 
-interface Props {
-  params: Promise<{ id: string }>;
-  children: React.ReactNode;
-}
+
 
 export async function generateMetadata({
   params,
@@ -36,9 +26,7 @@ export async function generateMetadata({
       title = `AI Audit — Score ${report.score}/100 · $${savings.toLocaleString()}/mo savings | StackAudit`;
       description = `Your AI stack of ${toolCount} tool${toolCount !== 1 ? "s" : ""} scored ${report.score}/100. Estimated recoverable savings: $${savings.toLocaleString()}/month.`;
     }
-  } catch {
-    // Use default metadata if report fetch fails
-  }
+  } catch {}
 
   return {
     title,

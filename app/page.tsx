@@ -3,12 +3,10 @@ import type { Metadata } from "next";
 import {
   Sparkles,
   ArrowRight,
-  Zap,
   Users,
   BarChart3,
   Share2,
   ShieldCheck,
-  GitMerge,
   TrendingDown,
   CheckCircle,
   ChevronRight,
@@ -289,7 +287,7 @@ function FeatureBento() {
               </div>
               <h3 className="text-lg font-semibold text-white/90">Rule-based audit engine</h3>
               <p className="text-sm text-white/40 leading-relaxed">
-                We don't use generic AI to guess. Our deterministic engine applies 11 strict logic rules to find exact inefficiencies based on real-world SaaS pricing.
+                We don&apos;t use generic AI to guess. Our deterministic engine applies 11 strict logic rules to find exact inefficiencies based on real-world SaaS pricing.
               </p>
             </div>
             {/* Decorative background element */}
@@ -319,7 +317,7 @@ function FeatureBento() {
               </div>
               <h3 className="text-lg font-semibold text-white/90">Stage-aware</h3>
               <p className="text-sm text-white/40 leading-relaxed">
-                Recommendations adapt based on whether you're a 5-person Seed team or a 50-person Series B.
+                Recommendations adapt based on whether you&apos;re a 5-person Seed team or a 50-person Series B.
               </p>
             </div>
           </div>

@@ -1,13 +1,7 @@
 import type { AuditInput, Recommendation, ToolAnalysis, ToolEntry } from "./types";
-import { FREQUENCY_WEIGHT, TOOLS, LOW_UTILIZATION_THRESHOLD } from "../constants";
+import { FREQUENCY_WEIGHT, LOW_UTILIZATION_THRESHOLD } from "../constants";
 
-// ─────────────────────────────────────────────
-// Scoring Engine
-//
-// Score = 100, then deduct based on recommendations and
-// add bonuses for efficient spend patterns.
-// Output is clamped to [0, 100].
-// ─────────────────────────────────────────────
+
 
 const SEVERITY_DEDUCTIONS: Record<string, number> = {
   critical: 20,
