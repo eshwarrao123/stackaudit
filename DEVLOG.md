@@ -171,3 +171,29 @@
 - Final deployment
 - Submission document preparation
 - Demo polishing
+
+
+
+## Day 6 - 2026-05-13
+
+**Hours worked:** 6
+
+**What I did:**
+- Implemented the `/api/summary` endpoint to generate personalized executive summaries using the OpenAI API.
+- Engineered a deterministic fallback mechanism that seamlessly replaces the AI summary with programmatic text if the OpenAI API fails.
+- Created the `/api/leads` route integrating the Resend SDK for transactional email delivery upon lead capture.
+- Configured a strict CI pipeline enforcing `npm run lint`, `npx tsc --noEmit`, and `npm test` checks.
+- Cleaned the codebase for production by removing non-essential debug logs and development comments.
+- Resolved all Radix UI accessibility warnings in the component library by injecting visually hidden fallback titles.
+
+### What I learned
+- **Graceful Degradation**: Relying purely on third-party APIs for critical UI text is risky. Implementing a fallback to the deterministic engine ensures the application remains highly available even during vendor outages.
+- **Spam Mitigation**: Implementing a visually hidden honeypot field is a highly effective, frictionless method for reducing automated form submissions compared to implementing heavy third-party CAPTCHA scripts.
+
+### Issues encountered
+- **OpenAI Rate Limiting**: Hit `429 Too Many Requests` errors during consecutive testing phases. This caused unhandled promise rejections that crashed the local development server.
+- **Supabase Integration**: Initial REST API fetch calls returned `404 Not Found` due to malformed pathing (`/rest/v1/rest/v1/reports`).
+
+### What I improved
+- Replaced the manual Supabase fetch implementation with the official `@supabase/supabase-js` SDK, immediately resolving the routing errors and improving type safety.
+- Updated the AI summary error handling to intercept `429` status codes specifically, logging a clean warning and successfully routing the user to the deterministic fallback without throwing terminal stack traces.
