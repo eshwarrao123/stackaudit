@@ -15,8 +15,22 @@ CREATE TABLE IF NOT EXISTS reports (
   critical_count INTEGER NOT NULL DEFAULT 0,
   team_size     INTEGER NOT NULL DEFAULT 1,
   active_tools  INTEGER NOT NULL DEFAULT 0,
-  payload       JSONB NOT NULL               -- Full FullAuditReport as JSONB
+  payload       JSONB NOT NULL,              -- Full FullAuditReport as JSONB
+  -- New fields for round 2:
+  user_email       TEXT,
+  input_stack      JSONB,
+  audit_result     JSONB,
+  pricing_snapshot JSONB,
+  pricing_version  TEXT
 );
+
+-- Migration for existing tables:
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS user_email TEXT;
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS input_stack JSONB;
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS audit_result JSONB;
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS pricing_snapshot JSONB;
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS pricing_version TEXT;
+
 
 -- Leads table: post-audit email capture
 CREATE TABLE IF NOT EXISTS leads (
@@ -42,6 +56,10 @@ CREATE POLICY "reports_public_read" ON reports
 -- Public insert: client inserts new reports
 CREATE POLICY "reports_public_insert" ON reports
   FOR INSERT WITH CHECK (true);
+
+-- Public update: client can update user_email
+CREATE POLICY "reports_public_update" ON reports
+  FOR UPDATE USING (true);
 
 -- Leads: insert only
 CREATE POLICY "leads_public_insert" ON leads

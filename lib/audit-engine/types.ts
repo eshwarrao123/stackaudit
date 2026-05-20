@@ -31,10 +31,15 @@ export interface AuditEngineResult {
   activeToolsCount: number;
 }
 
+import type { PricingSnapshot } from "../pricing/current-pricing";
+
 export interface FullAuditReport extends AuditEngineResult {
   id: string;
   timestamp: string;
   input: AuditInputSchema;
+  userEmail?: string;
+  pricingSnapshot?: PricingSnapshot;
+  pricingVersion?: string;
 }
 
 export interface RuleContext {
