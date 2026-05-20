@@ -1,10 +1,10 @@
 
-## Interview 1 — Karthik R. (Friend’s Brother)
+## Interview 1 — Bholenath R. (Friend’s Brother)
 **Role:** Programmer Analyst @ Cognizant  
 **Team Size:** ~18 developers in internal banking project  
 **Call Duration:** ~15 mins on Google Meet
 
-Karthik said their team started using multiple AI tools separately without any planning. Some developers preferred GitHub Copilot while others switched to Cursor after seeing YouTube videos and Twitter posts.
+Bholenath said their team started using multiple AI tools separately without any planning. Some developers preferred GitHub Copilot while others switched to Cursor after seeing YouTube videos and Twitter posts.
 
 > “Honestly nobody even knows which tools are officially approved anymore.”
 
@@ -27,12 +27,12 @@ Instead of saying “cancel immediately,” the report became more cautious and 
 
 ---
 
-## Interview 2 — Sai Teja (College Senior)
+## Interview 2 — Rahul (College Senior)
 **Role:** Data Analyst @ TCS  
 **Team Size:** ~12 people  
 **Conversation:** Discord call (~10–12 mins)
 
-Sai Teja mainly works with dashboards, Excel automation, SQL, and internal reporting. He said their team recently started experimenting with ChatGPT Team licenses while some employees still used Gemini and Claude separately.
+Rahul mainly works with dashboards, Excel automation, SQL, and internal reporting. He said their team recently started experimenting with ChatGPT Team licenses while some employees still used Gemini and Claude separately.
 
 > “Most people don’t use these tools daily. They use them heavily for one week and forget about them.”
 
@@ -55,12 +55,12 @@ I simplified several recommendation cards because the earlier wording felt too t
 
 ---
 
-## Interview 3 — Akhil S. (Friend Running Small Agency)
+## Interview 3 — Sai S. (Friend Running Small Agency)
 **Role:** Freelance Designer + Small Agency Owner  
 **Team Size:** 4 people  
 **Conversation:** In person
 
-Akhil’s team uses Midjourney, ChatGPT Plus, Canva Pro, and Runway occasionally for client work. Since the team is small, he tracks expenses personally.
+Sai’s team uses Midjourney, ChatGPT Plus, Canva Pro, and Runway occasionally for client work. Since the team is small, he tracks expenses personally.
 
 > “Subscriptions are annoying because every tool slowly adds AI features and charges separately.”
 
