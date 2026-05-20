@@ -30,5 +30,5 @@ export const CURRENT_PRICING: Record<ToolId, ToolPricing> = {
 
 export const createPricingSnapshot = (): PricingSnapshot => ({
   version: pricingVersion,
-  prices: { ...CURRENT_PRICING },
+  prices: JSON.parse(JSON.stringify(CURRENT_PRICING)),
 });
