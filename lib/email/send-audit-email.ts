@@ -8,7 +8,7 @@
 // Graceful: returns { success: false } if key is missing or send fails.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const RESEND_FROM = "StackAudit <hello@stackaudit.app>";
+const RESEND_FROM = "StackAudit <onboarding@resend.dev>";
 
 export interface AuditEmailPayload {
   to: string;
