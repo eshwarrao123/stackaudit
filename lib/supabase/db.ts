@@ -44,6 +44,18 @@ export async function persistReport(report: FullAuditReport): Promise<void> {
       team_size: report.input.teamSize,
       active_tools: report.activeToolsCount,
       payload: report as unknown as Record<string, unknown>,
+      user_email: report.userEmail ?? null,
+      input_stack: report.input as unknown as Record<string, unknown>,
+      audit_result: {
+        score: report.score,
+        monthlyWaste: report.monthlyWaste,
+        totalRecoverableSavings: report.totalRecoverableSavings,
+        criticalIssueCount: report.criticalIssueCount,
+        recommendations: report.recommendations,
+        overlaps: report.overlaps,
+      } as unknown as Record<string, unknown>,
+      pricing_snapshot: report.pricingSnapshot as unknown as Record<string, unknown>,
+      pricing_version: report.pricingVersion ?? null,
     });
   } catch (err) {
     // Non-fatal: DB write failed, localStorage still has data
@@ -104,11 +116,14 @@ export async function submitLead(
       source,
     });
 
-    if (error) {
-      // Duplicate email is fine — don't surface error to user
-      if (error.code === "23505") return { success: true };
+    if (error && error.code !== "23505") {
+      // Return error if it's not a duplicate email error
       return { success: false, error: error.message };
     }
+    
+    // Also update the reports table to persist the user email
+    await supabase.from("reports").update({ user_email: email }).eq("id", reportId);
+
     return { success: true };
   } catch (err) {
     return { success: false, error: String(err) };
