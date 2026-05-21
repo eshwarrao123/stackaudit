@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { detectPricingChanges } from "../../lib/re-audit/detect-pricing-changes";
 import { CURRENT_PRICING, createPricingSnapshot } from "../../lib/pricing/current-pricing";
-import type { ToolId } from "../../lib/engine/types";
+import type { PricingSnapshot } from "../../lib/pricing/current-pricing";
 
 describe("detectPricingChanges", () => {
   it("detects no changes when snapshot matches current pricing", () => {
@@ -27,8 +27,12 @@ describe("detectPricingChanges", () => {
 
   it("detects a removed tool", () => {
     const snapshot = createPricingSnapshot();
-    // Add a fake tool to the snapshot that doesn't exist in CURRENT_PRICING
-    snapshot.prices["fake-tool" as ToolId] = { typicalSeatCost: 50 };
+    // Add a fake tool to the snapshot that doesn't exist in CURRENT_PRICING.
+    // We extend as a wider type so the unknown key compiles cleanly.
+    const extended = snapshot as PricingSnapshot & {
+      prices: Record<string, { typicalSeatCost: number }>;
+    };
+    extended.prices["fake-tool"] = { typicalSeatCost: 50 };
     
     const changes = detectPricingChanges(snapshot);
     expect(changes).toHaveLength(1);
@@ -42,8 +46,10 @@ describe("detectPricingChanges", () => {
 
   it("detects an added tool", () => {
     const snapshot = createPricingSnapshot();
-    // Remove a tool from the snapshot to simulate it being added to CURRENT_PRICING recently
-    delete (snapshot.prices as any)["claude"];
+    // Remove a tool from the snapshot to simulate it being added to CURRENT_PRICING recently.
+    // Cast to a wider type to permit key deletion without TS2790.
+    const loose = snapshot.prices as Partial<typeof snapshot.prices>;
+    delete loose["claude"];
     
     const changes = detectPricingChanges(snapshot);
     expect(changes).toHaveLength(1);

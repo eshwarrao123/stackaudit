@@ -17,10 +17,8 @@ export function AuditComparisonHeader({
   const scoreDelta = newScore - oldScore;
 
   const isSavingsPositive = savingsDelta > 0;
-  const isSavingsNegative = savingsDelta < 0;
 
   const isScorePositive = scoreDelta > 0;
-  const isScoreNegative = scoreDelta < 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">

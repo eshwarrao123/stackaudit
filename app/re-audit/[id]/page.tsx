@@ -52,7 +52,7 @@ export default async function ReauditPage({
             Pricing Shift Analysis
           </h1>
           <p className="text-slate-400 text-lg">
-            We've re-run your previous audit against the latest SaaS pricing
+            We&apos;ve re-run your previous audit against the latest SaaS pricing
             models. Here is exactly what changed.
           </p>
         </div>

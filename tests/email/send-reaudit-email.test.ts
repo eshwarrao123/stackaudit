@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { sendReauditEmail } from "../../lib/email/send-reaudit-email";
+import type { AffectedAudit } from "../../lib/re-audit/types";
 
 const { sendMock } = vi.hoisted(() => ({
   sendMock: vi.fn().mockResolvedValue({ id: "mock-id" }),
@@ -22,13 +23,21 @@ describe("sendReauditEmail", () => {
   });
 
   it("sends an email when API key is present", async () => {
+    const stub: AffectedAudit = {
+      auditDiff: {
+        reportId: "123",
+        savingsDelta: 10,
+        scoreDelta: 5,
+        oldReport: {} as AffectedAudit["auditDiff"]["oldReport"],
+        newReport: {} as AffectedAudit["auditDiff"]["newReport"],
+        recommendationDiffs: [],
+      },
+      pricingChanges: [],
+    };
+
     const success = await sendReauditEmail({
       userEmail: "test@example.com",
-      affectedAudits: [
-        {
-          auditDiff: { reportId: "123", savingsDelta: 10, scoreDelta: 5 },
-        } as any,
-      ],
+      affectedAudits: [stub],
     });
 
     expect(success).toBe(true);
